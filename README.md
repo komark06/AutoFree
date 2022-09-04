@@ -25,3 +25,6 @@ Install git hooks to make sure you have a consistent coding style and static ana
 ```shell
 make hooks
 ```
+
+# License
+AutoFree is released under the BDS two-clause license. See the LICENSE file for more details.
