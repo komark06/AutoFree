@@ -51,15 +51,18 @@ void *evarealloc(void *ptr, size_t len)
         return NULL;
     // cppcheck-suppress nullPointer
     block_t *old = container_of(ptr, block_t, data);
+    pthread_mutex_lock(&lock);
+    // if (node_exist(&old->list,&head) == 0) // node is not on the list
+    //    return NULL;
     block_t *ne = e_realloc(old, sizeof(block_t) + len);
-    if (unlikely(!ne))
-        return NULL;
-    if (ne != old) {
-        pthread_mutex_lock(&lock);
-        list_del(&old->list);
-        list_add(&ne->list, &head);
+    if (unlikely(!ne)) {
         pthread_mutex_unlock(&lock);
+        return NULL;
+    } else if (ne != old) {
+        ne->list.prev->next = &ne->list;
+        ne->list.next->prev = &ne->list;
     }
+    pthread_mutex_unlock(&lock);
     return ne->data;
 }
 
