@@ -48,7 +48,7 @@ DESCRIPTION:
 
 TIME: 2022/9/11
 */
-__attribute__((nonnull)) static void show_err_r(const char *str,
+__attribute__((nonnull)) void show_err_r(const char *str,
                                                          const int err);
 
 /*

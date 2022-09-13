@@ -15,24 +15,6 @@ static inline int list_empty(const struct list_head *head)
     return (head->next == head);
 }
 
-/*
-    If @node is existed on the list, return 1.
-    Else, return 0.
-*/
-static inline int node_exist(const struct list_head *node,
-                             struct list_head *head)
-{
-    if (node == head)
-        return 1;
-    struct list_head *tmp = head->next;
-    while (tmp != head) {
-        if (tmp == node)
-            return 1;
-        tmp = tmp->next;
-    }
-    return 0;
-}
-
 static inline void init_list_head(struct list_head *head)
 {
     head->next = head;
