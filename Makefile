@@ -8,10 +8,6 @@ time ?= 1
 NORMAL=\e[m
 YELLOW=\033[1;33m
 
-test:
-	$(CC) test.c -o test $(SRC) -I$(INCLUDE) -O2 -Wextra -Wall -Winline -std=c99 -g -fsanitize=address -fsanitize=leak -fsanitize=undefined
-	$(CC) test.c $(SRC) -I$(INCLUDE) -O2 -Wextra -Wall -Winline -std=c99 -g
-
 all: $(SRC) $(INCLUDE)
 	$(CC) -o $(EXE) $(SRC) -I$(INCLUDE) $(CFLAG) -g -fsanitize=leak -D__AUTOFREE_TEST__ -pthread
 	@echo "Using $(YELLOW)LeakSanitizer$(NORMAL) to detect memory leak."
