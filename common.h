@@ -15,7 +15,8 @@
 
 // error code of the getnum() function
 #define FLOW_ERR -1
-#define NODIG_ERR -2
+#define NO_DIG_ERR -2
+#define EXTRA_DIG_ERR -3
 
 /*
 DESCRIPTION:
@@ -99,17 +100,17 @@ __attribute__((nonnull)) int newfile(FILE **fw, const char *filename);
 DESCRIPTION:
     Convert a string to integer.
     @num: pointer to store converted number.
-    @str: Original string that contain number.
+    @str: original string that contain number.
 
 RETURN VALUE:
     On succeed, return 0.
     On error, return negative value.
 
 ERROR:
-    NODIG_ERR: There is no digit in @str, or @str contain non-digit characters.
+    NO_DIG_ERR: There is no digit in @str, or @str contain non-digit characters.
     FLOW_ERR: @str will cause overflow or underflow.
 
-TIME: 2022/9/11
+TIME: 2022/9/15
 */
 __attribute__((nonnull)) int getnum(long *num, const char *str);
 
@@ -130,12 +131,15 @@ __attribute__((nonnull)) static inline int check_getnum(int err,
                                                         const char *str)
 {
     switch (err) {
-    case NODIG_ERR:
-        fprintf(stderr, "[%s] contains non-digit characters.\n", str);
-        goto Fail;
-    case FLOW_ERR:
-        fprintf(stderr, "[%s] will cause overflow or underflow.\n", str);
-        goto Fail;
+        case FLOW_ERR:
+            fprintf(stderr, "[%s] cause overflow or underflow.\n", str);
+            goto Fail;
+        case NO_DIG_ERR:
+            fprintf(stderr, "[%s] contains non-digit characters.\n", str);
+            goto Fail;
+        case EXTRA_DIG_ERR:
+            fprintf(stderr, "[%s] contains extra non-digit characters.\n", str);
+            goto Fail;
     }
     return 0;
 Fail:

@@ -52,8 +52,10 @@ __attribute__((nonnull)) int getnum(long *num, const char *str)
     long tmp = strtol(str, &ed, 10);
     if ((tmp == LONG_MAX || tmp == LONG_MIN) && errno == ERANGE)
         return FLOW_ERR;
-    if (*ed != '\0' || ed == str)
-        return NODIG_ERR;
+    if (ed == str)
+        return NO_DIG_ERR;
+    else if (*ed != '\0')
+        return EXTRA_DIG_ERR;
     *num = tmp;
     return 0;
 }
