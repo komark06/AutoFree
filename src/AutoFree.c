@@ -2,10 +2,6 @@
 extern "C" {
 #endif
 
-#include <stdio.h>
-#include <assert.h>
-#include "../common.h"
-
 #include "AutoFree.h"
 #include <pthread.h>
 #include <stdint.h>
@@ -47,25 +43,6 @@ void *evacalloc(size_t elem, size_t len)
     return init_alloc(e_calloc(1, sizeof(block_t) + elem * len));
 }
 
-/*
-    If @node is existed on the list, return 1.
-    Else, return 0.
-*/
-static inline int node_exist(const struct list_head *node,
-                             struct list_head *head)
-{
-    //printf("call node_exist(): ");
-    if (node == head)
-        return 1;
-    struct list_head *tmp = head->next;
-    while (tmp != head) {
-        if (tmp == node)
-            return 1;
-        tmp = tmp->next;
-    }
-    return 0;
-}
-
 void *evarealloc(void *ptr, size_t len)
 {
     if (!ptr)
@@ -75,8 +52,7 @@ void *evarealloc(void *ptr, size_t len)
     // cppcheck-suppress nullPointer
     block_t *old = container_of(ptr, block_t, data);
     pthread_mutex_lock(&lock);
-    //assert(node_exist(&old->list,&head) == 1);
-    if (node_exist(&old->list,&head) == 0){  // node is not on the list
+    if (node_exist(&old->list, &head) == 0) {  // node is not on the list
         pthread_mutex_unlock(&lock);
         return NULL;
     }
