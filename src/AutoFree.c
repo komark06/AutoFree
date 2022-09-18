@@ -99,16 +99,61 @@ leave:
 #if defined(__AUTOFREE_TEST__)
 
 #include <stdio.h>
+#include <string.h>
+
+#define SMALL_CHUNK_SIZE 10
+#define BIG_CHUNK_SZIE SMALL_CHUNK_SIZE * 2
+
+#define MAX_THREAD 100u
+
+#define DEADBEEF (void *) 0xdeadbeef
+
+static void show_err(const char *str, const int err)
+{
+    fprintf(stderr, "%s: %s\n", str, strerror(err));
+}
+
+void *check(const void *id)
+{
+    if (id)
+        pthread_exit(DEADBEEF);
+    for (size_t i = 0; i < 10000; ++i) {
+        evacalloc(1, SMALL_CHUNK_SIZE);
+        void *ptr = evamalloc(SMALL_CHUNK_SIZE);
+        if (!ptr)
+            pthread_exit(DEADBEEF);
+        evarealloc(ptr, BIG_CHUNK_SZIE);
+    }
+    evaAutoFree();
+    pthread_exit(NULL);
+}
 
 int main(void)
 {
-    for (size_t i = 0; i < 1000000; ++i) {
-        evacalloc(1, 100);
-        void *ptr = evamalloc(100);
-        evarealloc(ptr, 10);
+    pthread_t tid[MAX_THREAD];
+    unsigned int total = 0;
+    printf("Create %u threads to test.\n", MAX_THREAD);
+    for (; total < MAX_THREAD; ++total) {
+        int err = pthread_create(tid + total, NULL, check, NULL);
+        if (err) {
+            fprintf(stderr, "tid[%u]", total);
+            show_err("pthread_create", err);
+            break;
+        }
     }
-
+    for (unsigned int i = 0; i < total; ++i) {
+        void *ptr;
+        int err = pthread_join(tid[i], &ptr);
+        if (err) {
+            fprintf(stderr, "tid[%u]", i);
+            show_err("pthread_join", err);
+            continue;
+        }
+        if (ptr)
+            fprintf(stderr, "tid[%u] evamalloc failed\n", i);
+    }
     evaAutoFree();
+    puts("DONE");
     return 0;
 }
 
