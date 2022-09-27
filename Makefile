@@ -1,6 +1,6 @@
 CC=gcc
 CFLAG=-O2 -Werror -Wextra -Wall -Winline -std=c99 -pthread
-#FSAN=-fno-omit-frame-pointer -fsanitize=leak -fsanitize=address
+#FSAN=-fno-common -fno-omit-frame-pointer -fsanitize=leak -fsanitize=address
 SRC=src/AutoFree.c
 INCLUDE=include/
 EXE=auto-free-test
@@ -11,7 +11,7 @@ YELLOW=\033[1;33m
 check: $(SRC) $(INCLUDE)
 	$(CC) -o $(EXE) $(SRC) -I$(INCLUDE) $(CFLAG) -g -D__AUTOFREE_TEST__  $(FSAN)
 	@echo "Using $(YELLOW)valgrind$(NORMAL) to detect memory leak."
-	valgrind -q --error-exitcode=1 ./$(EXE) || (echo "Fail to pass."; exit 1)
+	valgrind --leak-check=full --errors-for-leak-kinds=all --error-exitcode=1 ./$(EXE)
 
 hooks:
 	@scripts/install-git-hooks

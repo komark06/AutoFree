@@ -104,7 +104,7 @@ leave:
 #define SMALL_CHUNK_SIZE 10
 #define BIG_CHUNK_SZIE SMALL_CHUNK_SIZE * 2
 
-#define MAX_THREAD 1000u
+#define MAX_THREAD 100u
 
 #define DEADBEEF (void *) 0xdeadbeef
 
@@ -120,10 +120,12 @@ void *check(void *id)
         pthread_exit(DEADBEEF);
     for (size_t i = 0; i < 100; ++i) {
         evacalloc(1, SMALL_CHUNK_SIZE);
-        void *ptr = evamalloc(SMALL_CHUNK_SIZE);
+        char *ptr = evamalloc(SMALL_CHUNK_SIZE);
         if (!ptr)
             pthread_exit(DEADBEEF);
-        evarealloc(ptr, BIG_CHUNK_SZIE);
+        ptr = evarealloc(ptr, BIG_CHUNK_SZIE);
+        if (!ptr)
+            pthread_exit(DEADBEEF);
     }
     // evaAutoFree();
     pthread_exit(NULL);
