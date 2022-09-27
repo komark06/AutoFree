@@ -11,7 +11,7 @@ YELLOW=\033[1;33m
 check: $(SRC) $(INCLUDE)
 	$(CC) -o $(EXE) $(SRC) -I$(INCLUDE) $(CFLAG) -g -D__AUTOFREE_TEST__  $(FSAN)
 	@echo "Using $(YELLOW)valgrind$(NORMAL) to detect memory leak."
-	valgrind @./$(EXE) || (echo "Fail to pass."; exit 1)
+	valgrind -q --error-exitcode=1 ./$(EXE) || (echo "Fail to pass."; exit 1)
 
 hooks:
 	@scripts/install-git-hooks

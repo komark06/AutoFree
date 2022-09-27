@@ -125,7 +125,7 @@ void *check(void *id)
             pthread_exit(DEADBEEF);
         evarealloc(ptr, BIG_CHUNK_SZIE);
     }
-    //evaAutoFree();
+    // evaAutoFree();
     pthread_exit(NULL);
 }
 
@@ -153,7 +153,7 @@ int main(void)
         if (ptr)
             fprintf(stderr, "tid[%u] evamalloc failed\n", i);
     }
-    //evaAutoFree();
+    // evaAutoFree();
     puts("DONE");
     return 0;
 }
