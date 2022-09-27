@@ -1,6 +1,6 @@
 CC=gcc
 CFLAG=-O2 -Werror -Wextra -Wall -Winline -std=c99 -pthread
-FSAN=-fsanitize=leak
+#FSAN=-fno-omit-frame-pointer -fsanitize=leak -fsanitize=address
 SRC=src/AutoFree.c
 INCLUDE=include/
 EXE=auto-free-test
@@ -8,10 +8,10 @@ EXE=auto-free-test
 NORMAL=\e[m
 YELLOW=\033[1;33m
 
-all: $(SRC) $(INCLUDE)
+check: $(SRC) $(INCLUDE)
 	$(CC) -o $(EXE) $(SRC) -I$(INCLUDE) $(CFLAG) -g -D__AUTOFREE_TEST__  $(FSAN)
-	@echo "Using $(YELLOW)LeakSanitizer$(NORMAL) to detect memory leak."
-	@./$(EXE)
+	@echo "Using $(YELLOW)valgrind$(NORMAL) to detect memory leak."
+	valgrind @./$(EXE) || (echo "Fail to pass."; exit 1)
 
 hooks:
 	@scripts/install-git-hooks

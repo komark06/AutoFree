@@ -104,7 +104,7 @@ leave:
 #define SMALL_CHUNK_SIZE 10
 #define BIG_CHUNK_SZIE SMALL_CHUNK_SIZE * 2
 
-#define MAX_THREAD 100u
+#define MAX_THREAD 1000u
 
 #define DEADBEEF (void *) 0xdeadbeef
 
@@ -113,18 +113,19 @@ static void show_err(const char *str, const int err)
     fprintf(stderr, "%s: %s\n", str, strerror(err));
 }
 
-void *check(const void *id)
+// cppcheck-suppress constParameter
+void *check(void *id)
 {
     if (id)
         pthread_exit(DEADBEEF);
-    for (size_t i = 0; i < 10000; ++i) {
+    for (size_t i = 0; i < 100; ++i) {
         evacalloc(1, SMALL_CHUNK_SIZE);
         void *ptr = evamalloc(SMALL_CHUNK_SIZE);
         if (!ptr)
             pthread_exit(DEADBEEF);
         evarealloc(ptr, BIG_CHUNK_SZIE);
     }
-    evaAutoFree();
+    //evaAutoFree();
     pthread_exit(NULL);
 }
 
@@ -152,7 +153,7 @@ int main(void)
         if (ptr)
             fprintf(stderr, "tid[%u] evamalloc failed\n", i);
     }
-    evaAutoFree();
+    //evaAutoFree();
     puts("DONE");
     return 0;
 }
